@@ -486,3 +486,8 @@ $RECYCLE.BIN/
 DocumentHandlerAPI/appsettings.json
 DocumentHandlerAPI/appsettings.Development.json
 DocumentHandlerAPI/appsettings.Production.json
+**/appsettings.json
+**/appsettings.Development.json
+**/appsettings.Production.json
+**/appsettings.*.json
+appsettings.*.json
