@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DocHandlerAPI 📄
 
-## Getting Started
+**DocHandlerAPI** is a simple, robust document-handler web service for storing, retrieving and managing documents. It aims to make saving and handling documents easy, flexible, and secure.
 
-First, run the development server:
+## Why DocHandlerAPI
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Many applications need a backend service that handles document upload, storage, retrieval, and metadata management. DocHandlerAPI abstracts these concerns into a reusable service, giving you:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Easy endpoints to upload documents  
+- Consistent handling and storage of files  
+- Flexibility for integration with front-end clients or other services  
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- RESTful API endpoints for document upload, download, list, delete  
+- Document metadata support (file name, upload date, etc.)  
+- Unit tests (see `DocumentHandlerAPI.Tests`)  
+- Clean and simple architecture  
 
-## Learn More
+## Prerequisites
 
-To learn more about Next.js, take a look at the following resources:
+- [.NET SDK](https://dotnet.microsoft.com/download) (match the version used by the project)
+- (Optional) Docker for containerized deployment
+- A storage location (local file system, cloud storage, or database — depending on your implementation)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Getting Started — Running Locally
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Clone the repository  
+   ```bash
+   git clone https://github.com/keithagreda/DocHandlerAPI.git
+   cd DocHandlerAPI
+2. Restore dependencies and build
+  dotnet restore
+  dotnet build
+3. Run the API
+   dotnet run --project DocumentHandlerAPI
+4. Run tests
+   dotnet test
 
-## Deploy on Vercel
+The API will run on your configured port (e.g., https://localhost:5001). You can interact with it using Postman, curl, or any HTTP client.
+API Endpoints (Example)
+Method	Endpoint	Description
+POST	/api/documents/upload	Upload a new document
+GET	/api/documents/{id}	Retrieve/download a document by ID
+GET	/api/documents	List all uploaded documents (metadata)
+DELETE	/api/documents/{id}	Delete a document by ID
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+##Project Structure
+DocumentHandlerAPI/         — main API project  
+DocumentHandlerAPI.Tests/   — unit tests  
+.gitignore  
+README.md
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+##Usage / Integration
+-Upload → send multipart/form-data request with the file.
+
+-Download → GET request using document ID.
+
+-List → GET /api/documents to display all uploaded files.
+
+-Easily integrate with Angular, React, mobile apps, or other backend services.
