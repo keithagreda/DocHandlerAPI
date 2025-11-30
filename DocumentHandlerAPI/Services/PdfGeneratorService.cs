@@ -5,24 +5,27 @@ using System.Text;
 
 namespace DocumentHandlerAPI.Services
 {
-    public class PdfGeneratorService
+    public class PdfGeneratorService : IPdfGeneratorService
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly ILogger<PdfGeneratorService> _logger;
         private readonly IS3FileStorageService _s3FileStorageService;
-        public PdfGeneratorService(ILogger<PdfGeneratorService> logger, IConfiguration configuration, HttpClient httpClient, IS3FileStorageService s3FileStorageService)
+        private readonly IDocumentService _documentService;
+        public PdfGeneratorService(ILogger<PdfGeneratorService> logger, IConfiguration configuration, HttpClient httpClient, IS3FileStorageService s3FileStorageService, IDocumentService documentService)
         {
             _logger = logger;
             _configuration = configuration;
             _httpClient = httpClient;
             _s3FileStorageService = s3FileStorageService;
+            _documentService = documentService;
         }
 
         public async Task<ApiResponse<string>> GeneratePDFAsync(PdfGenerationRequest req)
         {
             try
             {
+                var docId = Ulid.NewUlid();
                 // 1. Prepare HTML for Gotenberg
                 var fullHtml = PrepareHtmlForGotenberg(req.Html, req.Css);
 
@@ -30,7 +33,7 @@ namespace DocumentHandlerAPI.Services
                 var pdfBytes = await ConvertHtmlToPdfAsync(fullHtml);
 
                 // 3. Upload to S3
-                var fileName = req.FileName ?? $"{req.Id}.pdf";
+                var fileName = $"{docId}.pdf";
                 var s3Url = await _s3FileStorageService.SavePdfAsync(pdfBytes, fileName);
 
                 if (!s3Url.IsSuccess)
@@ -38,8 +41,19 @@ namespace DocumentHandlerAPI.Services
                     return ApiResponse<string>.Failure(s3Url.Error.Message, s3Url.StatusCode);
                 }
 
-                // 4. Save to database (implement based on your entity model)
-                // await SavePdfRecordAsync(request.EntityId, s3Url, fileName);
+                var docCreationRes = await _documentService.CreateDoc(new CreateDocumentDto
+                {
+                    URL = s3Url.Data,
+                    Id = docId,
+                    Description = req.Description,
+                    DocumentType = "PDF",
+                    Title = req.Title,
+                });
+
+                if (!docCreationRes.IsSuccess)
+                {
+                    return ApiResponse<string>.Failure(docCreationRes.Error.Message, docCreationRes.StatusCode);
+                }
 
                 return ApiResponse<string>.Success(s3Url.Data);
 

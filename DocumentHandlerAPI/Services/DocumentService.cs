@@ -26,7 +26,7 @@ namespace DocumentHandlerAPI.Services
             {
                 Document document = new Document
                 {
-                    Id = Ulid.NewUlid(),
+                    Id = dto.Id,
                     Title = dto.Title,
                     Description = dto.Description,
                     DocumentType = dto.DocumentType,

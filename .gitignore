@@ -487,3 +487,4 @@ $RECYCLE.BIN/
 echo "appsettings.json" >> .gitignore
 echo "appsettings.Development.json" >> .gitignore
 echo "appsettings.*.json" >> .gitignore
+DocumentHandlerAPI/appsettings.json
