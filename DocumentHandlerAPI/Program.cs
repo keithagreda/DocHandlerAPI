@@ -1,10 +1,15 @@
+using Amazon;
+using Amazon.Runtime;
 using Amazon.S3;
 using DocumentHandlerAPI.Data;
 using DocumentHandlerAPI.Interceptor;
 using DocumentHandlerAPI.Interfaces;
+using DocumentHandlerAPI.Models.Dtos;
 using DocumentHandlerAPI.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Scalar.AspNetCore;
 using System.IO.Compression;
 
@@ -35,7 +40,28 @@ builder.Services.Configure<GzipCompressionProviderOptions>(options =>
 
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IS3FileStorageService, S3FileStorageService>();
-builder.Services.AddAWSService<IAmazonS3>();
+builder.Services.AddScoped<IPdfGeneratorService, PdfGeneratorService>();
+builder.Services.AddSingleton<IAmazonS3>(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+
+    var accessKey = config["AWS:Credentials:AccessKey"];
+    var secretKey = config["AWS:Credentials:SecretKey"];
+    var region = config["AWS:Region"];
+
+    if (string.IsNullOrEmpty(accessKey) || string.IsNullOrEmpty(secretKey))
+    {
+        throw new InvalidOperationException("AWS credentials not configured!");
+    }
+
+    var credentials = new BasicAWSCredentials(accessKey, secretKey);
+    var s3Config = new AmazonS3Config
+    {
+        RegionEndpoint = RegionEndpoint.GetBySystemName(region)
+    };
+
+    return new AmazonS3Client(credentials, s3Config);
+});
 
 builder.Services.AddScoped<AuditInterceptor>();
 
@@ -68,6 +94,18 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
+
+app.MapPost("/api/documents/generate-pdf", async (
+    [FromBody] PdfGenerationRequest request,
+    [FromServices] IPdfGeneratorService pdfService) =>
+{
+    var result = await pdfService.GeneratePDFAsync(request);
+
+    return result.IsSuccess
+        ? Results.Ok(result)
+        : Results.StatusCode((int)result.StatusCode);
+})
+.WithName("GeneratePDF");
 
 app.Run();
 

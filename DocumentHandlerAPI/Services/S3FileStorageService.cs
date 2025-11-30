@@ -24,7 +24,7 @@ namespace DocumentHandlerAPI.Services
 
         public async Task<ApiResponse<string>> SavePdfAsync(byte[] pdfBytes, string fileName)
         {
-            var bucketName = _configuration["AWS:S3:BucketName"];
+            var bucketName = _configuration["AWS:BucketName"];
             var key = $"documents/{DateTime.UtcNow:yyyy/MM/dd}/{fileName}";
 
             using var stream = new MemoryStream(pdfBytes);
