@@ -77,8 +77,7 @@ namespace DocumentHandlerAPI.Services
             content.Add(htmlContent, "files", "index.html");
 
             // Optional: Add Gotenberg options
-            content.Add(new StringContent("A4"), "paperWidth");
-            content.Add(new StringContent("A4"), "paperHeight");
+            content.Add(new StringContent("false"), "landscape");
             content.Add(new StringContent("0.4"), "marginTop");
             content.Add(new StringContent("0.4"), "marginBottom");
             content.Add(new StringContent("0.4"), "marginLeft");
