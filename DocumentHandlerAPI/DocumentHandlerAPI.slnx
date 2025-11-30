@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../DocumentHandlerAPI.Tests/DocumentHandlerAPI.Tests.csproj" />
+  <Project Path="DocumentHandlerAPI.csproj" />
+</Solution>
