@@ -482,3 +482,8 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+
+echo "appsettings.json" >> .gitignore
+echo "appsettings.Development.json" >> .gitignore
+echo "appsettings.*.json" >> .gitignore
