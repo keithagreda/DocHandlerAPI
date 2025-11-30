@@ -25,6 +25,7 @@ namespace DocumentHandlerAPI.Services
         public async Task<ApiResponse<string>> SavePdfAsync(byte[] pdfBytes, string fileName)
         {
             var bucketName = _configuration["AWS:BucketName"];
+            var region = _configuration["AWS:Region"];
             var key = $"documents/{DateTime.UtcNow:yyyy/MM/dd}/{fileName}";
 
             using var stream = new MemoryStream(pdfBytes);
@@ -44,7 +45,7 @@ namespace DocumentHandlerAPI.Services
                 res.HttpStatusCode == HttpStatusCode.NoContent)
             {
                 // Success - S3 returns 200 OK or 204 No Content for successful uploads
-                var url = $"https://{bucketName}.s3.amazonaws.com/{key}";
+                var url = $"https://{bucketName}.s3.{region}.amazonaws.com/{key}";
                 _logger.LogInformation("PDF uploaded to S3: {Url}", url);
                 return ApiResponse<string>.Success(url);
             }
